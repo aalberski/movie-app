@@ -3,7 +3,7 @@ import requests
 from dotenv import load_dotenv
 import os
 from rich import print
-from models import Movie
+from .models import Movie
 
 load_dotenv()
 
