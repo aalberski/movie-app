@@ -18,6 +18,9 @@ def search_movie(title, year) -> Movie | None:
     except:
         return None
 
+# fix this
 def similar_movie(id):
     response = requests.get(f"https://api.themoviedb.org/3/movie/{id}/recommendations", params = {"api_key": api_key}, timeout=10)
-    return response.json()['results']
+    return response.json()
+
+# print(similar_movie(10))

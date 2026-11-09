@@ -1,3 +1,5 @@
+# Sqlite3 database to store list of movies
+
 import sqlite3
 import json
 import pandas as pd
@@ -36,3 +38,4 @@ def save_movie(movie: Movie) -> None:
     conn.commit()
 
 build_db(df.head(5))
+# build_db(df)
