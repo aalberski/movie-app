@@ -8,11 +8,17 @@
 </head>
 <body>
     <div>
-        <form method="post" action="/upload" enctype="multipart/form-data">
+        <form method="post" action="/uploadLetterBoxd" enctype="multipart/form-data">
             <label for="csv-file">File</label>
             <input id="csv-file" name="file" type="file" accept=".csv" required>
             <button id="submit-csv-file" type="submit">Upload</button>
         </form>
+    </div>
+    <div>
+        <a href="/getToken">Login to TMDB</a>
+    </div>
+    <div>
+        <a href="/syncTMDB">Get session id</a>
     </div>
     <script src="script.js"></script>
 </body>

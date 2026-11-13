@@ -2,8 +2,8 @@
 
 import sqlite3
 import json
-from tmdb import search_movie, get_user_list
-from models import Movie
+from .tmdb import search_movie, get_user_list
+from .models import Movie
 
 def build_letterboxd_db(datafile, database):
     conn = sqlite3.connect(database)
@@ -25,7 +25,7 @@ def build_letterboxd_db(datafile, database):
     conn.commit()
     conn.close()
 
-def build_tmdb_db(account_id, database):
+def build_tmdb_db(account_id, database, session_id):
     conn = sqlite3.connect(database)
     conn.execute(
         """
@@ -37,7 +37,7 @@ def build_tmdb_db(account_id, database):
         )
         """
     )
-    tmdb_movies = get_user_list(account_id)
+    tmdb_movies = get_user_list(account_id, session_id)
 
     for movie in tmdb_movies:
         save_movie(conn, movie)
@@ -58,5 +58,5 @@ def save_movie(conn: sqlite3.Connection, movie: Movie) -> None:
 def get_movies(conn: sqlite3.Connection):
     return("test")
 
-build_tmdb_db(24112422, "test2.db")
+# build_tmdb_db(24112422, "test2.db")
 

@@ -3,7 +3,7 @@ import requests
 from dotenv import load_dotenv
 import os
 from rich import print
-from models import Movie
+from .models import Movie
 
 load_dotenv()
 
@@ -14,11 +14,21 @@ def get_request_token() -> str:
     response = requests.get("https://api.themoviedb.org/3/authentication/token/new", params = {"api_key": api_key})
     return response.json()["request_token"]
 
+def create_session(request_token: str) -> str | None:
+    try:
+        response = requests.get("https://api.themoviedb.org/3/authentication/session/new",
+        params = {"api_key": api_key, "request_token": request_token})
+        print(response.json())
+        if(response.json()['success'] == False):
+            raise Error(response.json()['status_message'])
+        return response.json()['session_id']
+    except:
+        print("error")
+        return None
 
 def search_movie(title, year) -> Movie | None:
     try:
-        response = requests.get("https://api.themoviedb.org/3/search/movie", 
-        params = {"api_key": api_key, "query": title, "year": year}).json()['results']
+        response = requests.get("https://api.themoviedb.org/3/search/movie", params = {"api_key": api_key, "query": title, "year": year}).json()['results']
 
         filtered_response = [r for r in response if r['title'] == title and r['release_date'].startswith(str(year))]
         movie_response = filtered_response[0]
@@ -26,14 +36,21 @@ def search_movie(title, year) -> Movie | None:
     except:
         return None
 
-def get_user_list(account_id: int) -> list[Movie] | None:
+def get_account(session_id) -> str | None:
+    response = requests.get("https://api.themoviedb.org/3/account/", 
+    headers = {"accept" : "application/json", "Authorization" : f"Bearer {api_token}"},
+    params = {"api_key": api_key, "session_id": session_id})
+    print(response.json())
+    return response
+
+def get_user_list(account_id: int, session_id: str) -> list[Movie] | None:
     user_movie_list = []
     movies_response = []
     page = 1
     while True:
         response = requests.get(f"https://api.themoviedb.org/3/account/{account_id}/rated/movies", 
         headers = {"accept" : "application/json", "Authorization" : f"Bearer {api_token}"},
-        params = {"page": page})
+        params = {"page": page, "session_id": session_id})
         user_movie_list.extend(response.json()['results'])
         if page >= response.json()['total_pages']:
             break
@@ -42,12 +59,3 @@ def get_user_list(account_id: int) -> list[Movie] | None:
         clean_movie = Movie(id = raw_movie['id'], title = raw_movie['title'], backdrop_path = raw_movie['backdrop_path'], poster_path = raw_movie['poster_path'], vote_average = raw_movie['vote_average'])
         movies_response.append(clean_movie)
     return movies_response
-
-# fix this
-# def similar_movie(id):
-#     response = requests.get(f"https://api.themoviedb.org/3/movie/{id}/recommendations", params = {"api_key": api_key}, timeout=10)
-#     return response.json()
-
-# print(similar_movie(10))
-
-print(get_request_token())
